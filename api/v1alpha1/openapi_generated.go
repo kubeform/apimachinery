@@ -29,7 +29,50 @@ import (
 
 func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenAPIDefinition {
 	return map[string]common.OpenAPIDefinition{
-		"kubeform.dev/apimachinery/api/v1alpha1.State": schema_kubeformdev_apimachinery_api_v1alpha1_State(ref),
+		"kubeform.dev/apimachinery/api/v1alpha1.ResourceTimeout": schema_kubeformdev_apimachinery_api_v1alpha1_ResourceTimeout(ref),
+		"kubeform.dev/apimachinery/api/v1alpha1.State":           schema_kubeformdev_apimachinery_api_v1alpha1_State(ref),
+	}
+}
+
+func schema_kubeformdev_apimachinery_api_v1alpha1_ResourceTimeout(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"create": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"integer"},
+							Format: "int64",
+						},
+					},
+					"read": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"integer"},
+							Format: "int64",
+						},
+					},
+					"update": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"integer"},
+							Format: "int64",
+						},
+					},
+					"delete": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"integer"},
+							Format: "int64",
+						},
+					},
+					"default": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"integer"},
+							Format: "int64",
+						},
+					},
+				},
+			},
+		},
 	}
 }
 
