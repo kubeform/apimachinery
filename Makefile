@@ -45,7 +45,7 @@ endif
 ### These variables should not need tweaking.
 ###
 
-SRC_PKGS := api
+SRC_PKGS := api pkg
 SRC_DIRS := $(SRC_PKGS) *.go
 
 DOCKER_PLATFORMS := linux/amd64 linux/arm linux/arm64

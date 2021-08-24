@@ -14,10 +14,20 @@ github.com/go-openapi/jsonreference
 github.com/go-openapi/spec
 # github.com/go-openapi/swag v0.19.5
 github.com/go-openapi/swag
+# github.com/google/go-cmp v0.4.0
+## explicit
+github.com/google/go-cmp/cmp
+github.com/google/go-cmp/cmp/internal/diff
+github.com/google/go-cmp/cmp/internal/flags
+github.com/google/go-cmp/cmp/internal/function
+github.com/google/go-cmp/cmp/internal/value
 # github.com/mailru/easyjson v0.0.0-20190626092158-b2ccc519800e
 github.com/mailru/easyjson/buffer
 github.com/mailru/easyjson/jlexer
 github.com/mailru/easyjson/jwriter
+# github.com/qri-io/jsonpointer v0.1.1
+## explicit
+github.com/qri-io/jsonpointer
 # golang.org/x/net v0.0.0-20200324143707-d3edc9973b7e
 golang.org/x/net/idna
 # golang.org/x/text v0.3.2
