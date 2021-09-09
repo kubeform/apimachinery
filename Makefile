@@ -18,8 +18,11 @@ GO_PKG   := kubeform.dev
 REPO     := $(notdir $(shell pwd))
 BIN      := apimachinery
 
+# Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
+CRD_OPTIONS          ?= "crd:trivialVersions=true,allowDangerousTypes=true"
 # https://github.com/appscodelabs/gengo-builder
 CODE_GENERATOR_IMAGE ?= appscode/gengo:release-1.21
+API_GROUPS           ?= "core:v1alpha1"
 
 # This version-strategy uses git tags to set the version string
 git_branch       := $(shell git rev-parse --abbrev-ref HEAD)
@@ -45,7 +48,7 @@ endif
 ### These variables should not need tweaking.
 ###
 
-SRC_PKGS := api pkg
+SRC_PKGS := api pkg client apis
 SRC_DIRS := $(SRC_PKGS) *.go
 
 DOCKER_PLATFORMS := linux/amd64 linux/arm linux/arm64
@@ -117,6 +120,24 @@ clientset:
 			--input-dirs "$(GO_PKG)/$(REPO)/api/v1alpha1" \
 			--output-file-base zz_generated.deepcopy
 
+# Generate a typed clientset
+.PHONY: clientset2
+clientset2:
+	@docker run --rm                                   \
+		-u $$(id -u):$$(id -g)                           \
+		-v /tmp:/.cache                                  \
+		-v $$(pwd):$(DOCKER_REPO_ROOT)                   \
+		-w $(DOCKER_REPO_ROOT)                           \
+		--env HTTP_PROXY=$(HTTP_PROXY)                   \
+		--env HTTPS_PROXY=$(HTTPS_PROXY)                 \
+		$(CODE_GENERATOR_IMAGE)                          \
+		/go/src/k8s.io/code-generator/generate-groups.sh \
+			all                                            \
+			$(GO_PKG)/$(REPO)/client                       \
+			$(GO_PKG)/$(REPO)/apis                         \
+			"$(API_GROUPS)"                                \
+			--go-header-file "./hack/license/go.txt"
+
 # Generate openapi schema
 .PHONY: openapi
 openapi:
@@ -136,8 +157,43 @@ openapi:
 			--output-package "$(GO_PKG)/$(REPO)/api/v1alpha1"  \
 			--report-filename /tmp/violation_exceptions.list
 
+
+.PHONY: manifests
+manifests: gen-crds label-crds
+
+# Generate CRD manifests
+.PHONY: gen-crds
+gen-crds:
+	@echo "Generating CRD manifests"
+	@docker run --rm                        \
+		-u $$(id -u):$$(id -g)              \
+		-v /tmp:/.cache                     \
+		-v $$(pwd):$(DOCKER_REPO_ROOT)      \
+		-w $(DOCKER_REPO_ROOT)              \
+	    --env HTTP_PROXY=$(HTTP_PROXY)      \
+	    --env HTTPS_PROXY=$(HTTPS_PROXY)    \
+		$(CODE_GENERATOR_IMAGE)             \
+		controller-gen                      \
+			$(CRD_OPTIONS)                  \
+			paths="./apis/..."              \
+			output:crd:artifacts:config=crds
+
+
+.PHONY: label-crds
+label-crds: $(BUILD_DIRS)
+	@for f in crds/*.yaml; do \
+		echo "applying app.kubernetes.io/name=kubeform label to $$f"; \
+		kubectl label --overwrite -f $$f --local=true -o yaml app.kubernetes.io/part-of=kubeform.com > bin/crd.yaml; \
+		mv bin/crd.yaml $$f; \
+		kubectl label --overwrite -f $$f --local=true -o yaml app.kubernetes.io/name=core.kubeform.com > bin/crd.yaml; \
+		mv bin/crd.yaml $$f; \
+	done
+
 .PHONY: gen
 gen: clientset openapi
+
+.PHONY: gen2
+gen2: clientset2 manifests
 
 fmt: $(BUILD_DIRS)
 	@docker run                                                 \
