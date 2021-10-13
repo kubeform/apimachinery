@@ -30,8 +30,102 @@ import (
 
 func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenAPIDefinition {
 	return map[string]common.OpenAPIDefinition{
-		"kubeform.dev/apimachinery/api/v1alpha1.ResourceTimeout": schema_kubeformdev_apimachinery_api_v1alpha1_ResourceTimeout(ref),
-		"kubeform.dev/apimachinery/api/v1alpha1.State":           schema_kubeformdev_apimachinery_api_v1alpha1_State(ref),
+		"kubeform.dev/apimachinery/api/v1alpha1.CustomResourceToTerraformConversionOperation": schema_kubeformdev_apimachinery_api_v1alpha1_CustomResourceToTerraformConversionOperation(ref),
+		"kubeform.dev/apimachinery/api/v1alpha1.CustomResourceToTerraformConversionRequest":   schema_kubeformdev_apimachinery_api_v1alpha1_CustomResourceToTerraformConversionRequest(ref),
+		"kubeform.dev/apimachinery/api/v1alpha1.CustomResourceToTerraformConversionResponse":  schema_kubeformdev_apimachinery_api_v1alpha1_CustomResourceToTerraformConversionResponse(ref),
+		"kubeform.dev/apimachinery/api/v1alpha1.ResourceTimeout":                              schema_kubeformdev_apimachinery_api_v1alpha1_ResourceTimeout(ref),
+		"kubeform.dev/apimachinery/api/v1alpha1.State":                                        schema_kubeformdev_apimachinery_api_v1alpha1_State(ref),
+	}
+}
+
+func schema_kubeformdev_apimachinery_api_v1alpha1_CustomResourceToTerraformConversionOperation(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ConversionOperation describes a cr to tf conversion operation.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"request": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Request describes the attributes for the admission request.",
+							Ref:         ref("kubeform.dev/apimachinery/api/v1alpha1.CustomResourceToTerraformConversionRequest"),
+						},
+					},
+					"response": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Response describes the attributes for the admission response.",
+							Ref:         ref("kubeform.dev/apimachinery/api/v1alpha1.CustomResourceToTerraformConversionResponse"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"kubeform.dev/apimachinery/api/v1alpha1.CustomResourceToTerraformConversionRequest", "kubeform.dev/apimachinery/api/v1alpha1.CustomResourceToTerraformConversionResponse"},
+	}
+}
+
+func schema_kubeformdev_apimachinery_api_v1alpha1_CustomResourceToTerraformConversionRequest(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "CustomResourceToTerraformConversionRequest describes the request for the cr to tf conversion operation.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"object": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/runtime.RawExtension"),
+						},
+					},
+				},
+				Required: []string{"object"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/runtime.RawExtension"},
+	}
+}
+
+func schema_kubeformdev_apimachinery_api_v1alpha1_CustomResourceToTerraformConversionResponse(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "CustomResourceToTerraformConversionResponse describes the response for the cr to tf conversion operation.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"terraform": {
+						SchemaProps: spec.SchemaProps{
+							Default: "",
+							Type:    []string{"string"},
+							Format:  "",
+						},
+					},
+					"state": {
+						SchemaProps: spec.SchemaProps{
+							Default: "",
+							Type:    []string{"string"},
+							Format:  "",
+						},
+					},
+				},
+				Required: []string{"terraform", "state"},
+			},
+		},
 	}
 }
 
